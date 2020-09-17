@@ -6,29 +6,10 @@
     - "../vars/{{ ansible_os_family }}.yml"
   tags: ['timezone']
 
-- name: Install tzdata for Debian based distros
-  apt:
-    name: "{{ timezone_package }}"
-    update_cache: true
-    cache_valid_time: 86400
-    state: present
-  when: ansible_os_family == 'Debian'
-  tags: ['timezone']
-  become: true
-
-- name: Install tzdata for RedHat based distros
-  yum:
+- name: Install tzdata
+  package:
     name: "{{ timezone_package }}"
     state: present
-  when: ansible_os_family == 'RedHat'
-  tags: ['timezone']
-  become: true
-
-- name: Install tzdata for Archlinux based distros
-  pacman:
-    name: "{{ timezone_package }}"
-    state: present
-  when: ansible_os_family == 'Archlinux' or ansible_os_family == 'Arch Linux'
   tags: ['timezone']
   become: true
 
