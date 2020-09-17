@@ -1,19 +1,19 @@
 ---
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8
 dependency:
   name: galaxy
   requirements_file: requirements.yml
 driver:
   name: docker
 verifier:
-  name: goss
-  lint:
-    name: yamllint
+  name: ansible
 platforms:
   - name: timezone-centos7
     image: centos:7
-    privileged: true
-  - name: timezone-centos6
-    image: centos:6
     privileged: true
   - name: timezone-debian
     image: debian
@@ -23,9 +23,3 @@ provisioner:
   config_options:
     defaults:
       remote_tmp: /tmp
-  playbooks:
-    converge: playbook.yml
-  lint:
-    name: ansible-lint
-scenario:
-  name: default
