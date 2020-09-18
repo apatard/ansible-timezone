@@ -2,6 +2,7 @@
 - hosts: all
 
   vars:
-    timezone: 'America/New_York'
+    # On Debian, will be converted to America/Argentina/Catamarca
+    timezone: "America/Argentina/ComodRivadavia"
   roles:
     - timezone

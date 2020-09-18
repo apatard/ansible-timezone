@@ -13,6 +13,29 @@
   tags: ['timezone']
   become: true
 
+- name: Get properties of "{{ timezone_file }}"
+  stat:
+    path: "{{ timezone_file }}"
+  register: timezone_file_info
+
+# on reconfiguration, /var/lib/dpkg/info/tzdata.config will convert
+# the timezone. Eg US/Central to America/Chicago, so try to handle that
+# As a side effect, this will also avoid going back to UTC TZ on package
+# reconfiguration. See also Debian bugs mentionned later
+- name: override timezone configuration
+  block:
+    - name: Get tz name as converted by tzdata postinst script
+      script: ./file/convert_tz.sh "{{ timezone }}"
+      args:
+        executable: /bin/bash
+      changed_when: false
+      register: timezone_conv_tz
+    - name: Set new tz
+      set_fact:
+        timezone: "{{ timezone_conv_tz.stdout_lines[0] }}"
+  when:
+    - ansible_os_family == "Debian"
+
 - name: Set timezone config
   template:
     src: "timezone-{{ ansible_os_family }}.j2"
@@ -22,6 +45,9 @@
     group: root
   tags: ['timezone']
   become: true
+  register: timezone_tzconfig
+  when:
+    - timezone_file_info.stat.exists
 
 - name: Set link to localtime
   file:
@@ -34,3 +60,13 @@
     group: root
   tags: ['timezone']
   become: true
+
+# Correct way to configure TZ through tzdata package on Debian:
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=813226#10
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=848143#10
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=603809
+- name: reconfigure tzdata to ensure right configuration.
+  command: dpkg-reconfigure -f noninteractive tzdata
+  when:
+    - ansible_os_family == "Debian"
+    - timezone_tzconfig is changed

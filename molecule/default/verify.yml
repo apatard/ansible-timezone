@@ -25,3 +25,23 @@
         - s_zoneinfo.stat.pw_name == 'root'
         - s_zoneinfo.stat.gr_name == 'root'
         - s_zoneinfo.stat.mode == '0755'
+  - name: Get timezone
+    command: date +'%Z'
+    changed_when: false
+    register: cur_date
+  - name: Validate timezone
+    assert:
+      that:
+        - cur_date.stdout == "-03"
+  - name: Validate debian configuration
+    block:
+      - name: get debconf
+        command: debconf-show tzdata
+        register: debconf
+      - name: Check debconf output content
+        assert:
+          that:
+            - '"tzdata/Zones/America: Argentina/Catamarca" in debconf.stdout'
+            - '"tzdata/Areas: America" in debconf.stdout'
+    when:
+      - ansible_os_family == "Debian"
