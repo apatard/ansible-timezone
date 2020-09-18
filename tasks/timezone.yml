@@ -32,7 +32,7 @@
       register: timezone_conv_tz
     - name: Set new tz
       set_fact:
-        timezone: "{{ timezone_conv_tz.stdout_lines[0] }}"
+        timezone: "{{ timezone_conv_tz.stdout_lines[0] | default(timezone) }}"
   when:
     - ansible_os_family == "Debian"
 
