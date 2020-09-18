@@ -29,6 +29,7 @@
       args:
         executable: /bin/bash
       changed_when: false
+      check_mode: false
       register: timezone_conv_tz
     - name: Set new tz
       set_fact:
