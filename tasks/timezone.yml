@@ -55,7 +55,7 @@
     src: "{{ zoneinfo_dir }}{{ timezone }}"
     dest: "{{ localtime_file }}"
     force: true
-    mode: 0777
+    mode: 0644
     owner: root
     group: root
   tags: ['timezone']
