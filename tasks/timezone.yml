@@ -32,7 +32,7 @@
       register: timezone_conv_tz
     - name: Set new tz
       set_fact:
-        timezone: "{{ timezone_conv_tz.stdout_lines[0] | default(timezone) }}"
+        timezone: "{{ timezone_conv_tz.stdout | default(timezone) | trim }}"
   when:
     - ansible_os_family == "Debian"
 
@@ -67,6 +67,7 @@
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=603809
 - name: reconfigure tzdata to ensure right configuration.
   command: dpkg-reconfigure -f noninteractive tzdata
+  become: true
   when:
     - ansible_os_family == "Debian"
     - timezone_tzconfig is changed

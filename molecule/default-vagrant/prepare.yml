@@ -1,0 +1,20 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: update apt cache
+      apt:
+        update_cache: true
+    - name: Set vagrant user pass
+      user:
+        name: vagrant
+        password: "{{ vagrant_password }}"
+    - name: Change sudo configuration
+      copy:
+        dest: '/etc/sudoers.d/vagrant'
+        content: 'vagrant ALL=(ALL) ALL'
+        mode: 0400
+        owner: root
+        group: root
+  vars:
+    vagrant_password: '$6$3.966Ygbpj$qXP7fMPZy432q7vJjOXdTVg4Qq9O5jgpRevvopLNq9uAtho4LmZjinu4vp48EuH8MUDaK/lTSp9Dzq4d5UgYR0'

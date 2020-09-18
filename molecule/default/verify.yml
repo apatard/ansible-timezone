@@ -38,6 +38,7 @@
       - name: get debconf
         command: debconf-show tzdata
         register: debconf
+        become: true
       - name: Check debconf output content
         assert:
           that:

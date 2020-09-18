@@ -1,0 +1,26 @@
+---
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: libvirt
+verifier:
+  name: ansible
+platforms:
+  - name: instance-debian
+    box: debian/buster64
+provisioner:
+  name: ansible
+  config_options:
+    ssh_connection:
+      pipelining: true
+    sudo_become_plugin:
+      password: test
+  playbooks:
+    verify: ../default/verify.yml
